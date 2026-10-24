@@ -1,5 +1,5 @@
 # VibeMix — Project State
-# Status: LIVING  ·  Updated: 2026-10-24 (v0.2, Phase 4 done)  ·  Owner: any chat in the "DJ Software" project
+# Status: LIVING  ·  Updated: 2026-10-24 (v0.2.1, Phase 4 done)  ·  Owner: any chat in the "DJ Software" project
 
 > **Division of truth:** this file owns FACTS (what is true right now). `PROJECT_ROADMAP.md`
 > owns PLANS. When they disagree, this file wins and the roadmap gets corrected. Decisions
@@ -103,7 +103,11 @@ incoming song for Breath) and are written as `0:00 Title` lines = YouTube chapte
 - Packaged apps are unsigned: Mac shows the Gatekeeper warning once (right-click → Open); Windows
   SmartScreen may show "More info → Run anyway" once. Code signing costs money; not doing it.
 - Packaged builds verified only by inspecting the zips' contents (app bundle + exe + folders
-  present). Not yet launched on Gabe's real machines.
+  present). Not yet launched on Gabe's real machines. The script version was fully exercised with
+  7 real CC songs (see roadmap session note) — everything works; only Gabe's ears are missing.
+- A hand-off into a song with a quiet intro (or out of one that fades) will sound like a dip no
+  matter which style is used. That's the music, not the engine: the fix is the trim handles.
+  Don't add auto-trim; it's a taste call.
 - Peak limiter is per-song, applied before blending; the crossfade itself is equal-power so the
   sum stays under the ceiling in practice (tested), but there is no final master limiter.
 

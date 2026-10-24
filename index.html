@@ -202,10 +202,10 @@ function buildWave(wrap, t, audioEl){
       const W = wrap.clientWidth;
       const move = ev => {
         const x = Math.min(Math.max(ev.clientX - wrap.getBoundingClientRect().left, 0), W);
-        const sec = Math.round(x/W*secs);
-        if (which==='start') t.trim_start = Math.min(sec, secs - (t.trim_end||0) - 5);
-        else t.trim_end = Math.min(secs - sec, secs - (t.trim_start||0) - 5);
-        t.trim_start = Math.max(0, t.trim_start||0); t.trim_end = Math.max(0, t.trim_end||0);
+        const sec = Math.round(x/W*secs), total = Math.floor(secs);
+        if (which==='start') t.trim_start = Math.min(sec, total - (t.trim_end||0) - 5);
+        else t.trim_end = Math.min(total - sec, total - (t.trim_start||0) - 5);
+        t.trim_start = Math.max(0, Math.round(t.trim_start||0)); t.trim_end = Math.max(0, Math.round(t.trim_end||0));
         layout(); wrap.dispatchEvent(new CustomEvent('trim'));
       };
       h.onpointermove = move;

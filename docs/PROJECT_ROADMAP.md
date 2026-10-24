@@ -71,3 +71,15 @@ release-on-push-to-main with the tag read from `app.py`; added `.app`-aware fold
 Quit button for the windowless packaged app; first run green on both OSes; Release v0.2 verified
 (zips downloaded and inspected). Drive mirror synced; `VibeMix.zip` on Drive retired.
 Open: Gabe's first real render (Phase 2) — now from the packaged app or the launcher.
+
+### 2026-10-24 — chat #2, later: real-music automation test → v0.2.1
+Gabe asked for a full feature test on real songs. Set up `Desktop/VibeMix` on his PC (exe + 7
+Creative-Commons tracks from archive.org netlabels, 31 min, −7.5…−18.2 LUFS spread). Drove the
+UI in headless Chromium: waveform-derived trims, drag handles, all three hand-offs (blends 5–25 s),
+6 auditions, drag-reorder (verified by synthetic DnD events), save → reload → load, render with
+MP3 (28:32, 50 s render), Quit. Zero console errors. Output analysis: every song body lands at
+−13.6…−14.4 LUFS, peak 0.98, both Breath gaps silent, MP3 length = WAV length. Dissolve blend
+regions measured −17/−22 LUFS; traced to the songs' own quiet intros/fade-outs (incoming heads at
+−22 LUFS, outgoing tail −26), NOT the filter — a makeup-gain prototype changed nothing, so Dissolve
+was left as is. Fixed: dragged trims saved as floats (32.1399…) → rounded; MP3 with a lying header
+listed as 4:48 when it plays 4:26 → list uses decoded length once the waveform is cached. v0.2.1.

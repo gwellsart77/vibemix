@@ -9,7 +9,7 @@ from urllib.parse import unquote
 
 import engine
 
-VERSION = "0.2"
+VERSION = "0.2.1"
 PORT = 8765
 
 BASE = os.path.dirname(os.path.abspath(sys.argv[0]))
@@ -42,8 +42,17 @@ def list_tracks():
     out = []
     for name in sorted(os.listdir(TRACKS), key=str.lower):
         if name.lower().endswith(engine.AUDIO_EXT) and not name.startswith("."):
+            path = os.path.join(TRACKS, name)
             try:
-                out.append(engine.track_info(os.path.join(TRACKS, name)))
+                info = engine.track_info(path)
+                # MP3 headers sometimes lie about length; once the waveform has been decoded, trust that instead
+                cpath = os.path.join(CACHE, engine._cache_key(path) + ".json")
+                if os.path.isfile(cpath):
+                    try:
+                        info["seconds"] = json.load(open(cpath))["seconds"]
+                    except Exception:
+                        pass
+                out.append(info)
             except Exception as e:
                 out.append({"file": name, "error": str(e)})
     return out
