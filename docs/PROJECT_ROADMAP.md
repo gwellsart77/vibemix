@@ -82,4 +82,8 @@ MP3 (28:32, 50 s render), Quit. Zero console errors. Output analysis: every song
 regions measured −17/−22 LUFS; traced to the songs' own quiet intros/fade-outs (incoming heads at
 −22 LUFS, outgoing tail −26), NOT the filter — a makeup-gain prototype changed nothing, so Dissolve
 was left as is. Fixed: dragged trims saved as floats (32.1399…) → rounded; MP3 with a lying header
-listed as 4:48 when it plays 4:26 → list uses decoded length once the waveform is cached. v0.2.1.
+listed as 4:48 when it plays 4:26 → list uses decoded length once the waveform is cached. v0.2.1
+released (CI green) and swapped onto Gabe's PC; test mix MP3 + tracklist sent to him, and the
+"Real test mix" arrangement placed in his `mixes\` so it shows in the Saved mixes dropdown.
+Gabe also asked to rip songs with OBS — declined (ToS + quality), pointed to CC/free sources.
+Open: Gabe's by-ear Phase 2 feedback.

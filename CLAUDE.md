@@ -28,6 +28,8 @@ person understand this control on first sight?* Fewer controls beats more. Plain
   https://github.com/gwellsart77/vibemix/releases/latest — no Python needed on Gabe's machines.
 - Drive `vibemix/` is a mirror Claude keeps in sync by hand (Gabe runs the script version from it);
   `VibeMix.zip` on Drive is retired — the Release is the download.
+- Gabe's PC has a ready-to-use install at `Desktop\VibeMix\` (VibeMix.exe v0.2.1, 7 Creative-Commons
+  practice tracks in `tracks\`, the "Real test mix" arrangement in `mixes\`).
 - To ship a new version: bump `VERSION` in `app.py`, push to `main`. That's it.
 - The session git proxy **cannot push tags** (403) — that's why the release is cut from a push to
   `main`, not from a `v*` tag. Don't "fix" this by switching back to tag-triggered releases.
@@ -82,8 +84,9 @@ incoming song for Breath) and are written as `0:00 Title` lines = YouTube chapte
 1. No beatmatching / time-stretch / BPM detection in the core product.
 2. No subscriptions, no cloud, no accounts. Runs locally, free forever.
 3. UI stays one HTML file; engine stays plain Python. No frameworks unless a feature truly needs one.
-4. Prefer Bandcamp lossless purchases as source material. (OBS-ripping streams breaks platform
-   ToS and compressed audio degrades under processing — documented in `_archive/` blueprint.)
+4. Prefer Bandcamp lossless purchases (or free CC music) as source material. No recording streams
+   with OBS etc.: breaks platform ToS and compressed audio degrades under processing. Gabe asked
+   about it 2026-10-24; declined, gave him CC practice tracks instead.
 5. YouTube Content ID is NOT a safe harbor: some rightsholders block or mute rather than
    monetize. Treat each track's reuse policy as a per-artist question.
 
@@ -108,6 +111,8 @@ incoming song for Breath) and are written as `0:00 Title` lines = YouTube chapte
 - A hand-off into a song with a quiet intro (or out of one that fades) will sound like a dip no
   matter which style is used. That's the music, not the engine: the fix is the trim handles.
   Don't add auto-trim; it's a taste call.
+- Claude can't delete files on Gabe's PC (blocked by default) — `Desktop\VibeMix\` has a stray
+  `VibeMix-Windows.zip`, `v021.zip` and an empty `VibeMix\` subfolder he can delete.
 - Peak limiter is per-song, applied before blending; the crossfade itself is equal-power so the
   sum stays under the ceiling in practice (tested), but there is no final master limiter.
 
