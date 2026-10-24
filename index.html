@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>VibeMix</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    --bg:#121212; --panel:#1c1c1e; --panel2:#242427; --line:#2e2e32;
+    --ink:#ececec; --muted:#8e8e93; --accent:#e8b04a; --accent2:#5fb3a3; --danger:#d9534f;
+    font-family: -apple-system, "Segoe UI", Inter, system-ui, sans-serif;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); }
+  header { padding:16px 28px; display:flex; align-items:baseline; gap:14px; border-bottom:1px solid var(--line); }
+  header h1 { margin:0; font-size:20px; letter-spacing:.5px; }
+  header h1 span { color:var(--accent); }
+  header small { color:var(--muted); }
+  header .ver { margin-left:auto; color:var(--muted); font-size:12px; }
+  main { display:grid; grid-template-columns: 300px 1fr; min-height:calc(100vh - 56px); }
+  aside { border-right:1px solid var(--line); padding:18px; overflow:auto; }
+  section { padding:18px 28px 60px; overflow:auto; max-width:1100px; }
+  h2 { font-size:12px; text-transform:uppercase; letter-spacing:1.2px; color:var(--muted); margin:0 0 10px; }
+  .song { padding:8px 10px; border-radius:8px; cursor:pointer; display:flex; justify-content:space-between; gap:8px; font-size:14px; align-items:center; }
+  .song:hover { background:var(--panel2); }
+  .song .dur { color:var(--muted); font-variant-numeric:tabular-nums; font-size:12px; }
+  .song .bad { color:var(--danger); font-size:11px; }
+  .empty { color:var(--muted); font-size:13px; line-height:1.5; padding:8px 10px; }
+  button { background:var(--panel2); color:var(--ink); border:1px solid var(--line); border-radius:8px; padding:8px 14px; cursor:pointer; font-size:13px; }
+  button:hover { border-color:var(--muted); }
+  button:disabled { opacity:.5; cursor:default; }
+  button.primary { background:var(--accent); color:#1a1300; border:none; font-weight:600; font-size:15px; padding:12px 22px; }
+  button.ghost { background:transparent; }
+  button.icon { padding:5px 9px; }
+  button.small { padding:5px 10px; font-size:12px; }
+  .toolbar { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:16px; }
+  .toolbar .opts { display:flex; gap:14px; flex-wrap:wrap; }
+  input[type=text] { background:var(--panel); border:1px solid var(--line); color:var(--ink); border-radius:8px; padding:9px 12px; font-size:15px; min-width:260px; }
+  select { background:var(--panel2); border:1px solid var(--line); color:var(--ink); border-radius:6px; padding:6px 8px; font-size:13px; }
+  label.chk { color:var(--muted); font-size:13px; display:flex; gap:6px; align-items:center; white-space:nowrap; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:12px 16px 14px; }
+  .card.dragging { opacity:.4; }
+  .card.over { border-color:var(--accent); }
+  .card .top { display:flex; align-items:center; gap:10px; }
+  .card .grip { color:var(--muted); cursor:grab; font-size:18px; padding:0 2px; user-select:none; }
+  .card .num { color:var(--accent); font-weight:600; width:24px; }
+  .card .name { flex:1; font-size:15px; }
+  .card .name small { color:var(--muted); font-size:12px; margin-left:6px; }
+  .card .row { display:flex; gap:16px; margin-top:8px; flex-wrap:wrap; align-items:center; font-size:13px; color:var(--muted); }
+  .card .row label { display:flex; gap:7px; align-items:center; }
+  input[type=number] { width:62px; background:var(--panel2); border:1px solid var(--line); color:var(--ink); border-radius:6px; padding:5px 7px; font-size:13px; }
+  input[type=range] { width:140px; accent-color:var(--accent); }
+  .wave { position:relative; height:64px; margin-top:10px; border-radius:6px; background:var(--panel2); overflow:hidden; cursor:crosshair; user-select:none; }
+  .wave canvas { position:absolute; inset:0; width:100%; height:100%; }
+  .wave .skip { position:absolute; top:0; bottom:0; background:rgba(0,0,0,.55); pointer-events:none; }
+  .wave .h { position:absolute; top:0; bottom:0; width:14px; margin-left:-7px; cursor:ew-resize; }
+  .wave .h::after { content:""; position:absolute; left:6px; top:0; bottom:0; width:2px; background:var(--accent); }
+  .wave .h span { position:absolute; top:3px; font-size:10px; color:var(--accent); background:var(--bg); padding:1px 4px; border-radius:3px; white-space:nowrap; }
+  .wave .h.start span { left:9px; }  .wave .h.end span { right:9px; }
+  .wave .cursor { position:absolute; top:0; bottom:0; width:1px; background:var(--ink); opacity:.7; pointer-events:none; display:none; }
+  .wave .loading { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:12px; }
+  .hand { margin:4px 0 4px 40px; padding:8px 14px; border-left:2px solid var(--accent2); display:flex; gap:14px; align-items:center; flex-wrap:wrap; font-size:13px; color:var(--muted); }
+  .hand b { color:var(--accent2); font-weight:500; }
+  .hand label { display:flex; gap:7px; align-items:center; }
+  .hand .aud { display:flex; gap:10px; align-items:center; margin-left:auto; }
+  .hint { font-size:12px; color:var(--muted); margin-top:8px; line-height:1.5; }
+  #progress { margin-top:18px; }
+  .bar { height:8px; background:var(--panel2); border-radius:4px; overflow:hidden; }
+  .bar div { height:100%; background:var(--accent2); width:0%; transition:width .4s; }
+  .status { font-size:13px; color:var(--muted); margin-top:6px; }
+  .done { background:var(--panel); border:1px solid var(--accent2); border-radius:12px; padding:14px 16px; margin-top:14px; line-height:1.6; }
+  .done code { color:var(--accent2); font-size:12px; word-break:break-all; }
+  audio { height:30px; width:220px; }
+  audio.wide { width:100%; }
+  .err { color:var(--danger); }
+  .stack { display:flex; flex-direction:column; gap:8px; margin-top:12px; }
+  .stack button { text-align:left; }
+  .upl { font-size:12px; color:var(--muted); margin-top:6px; }
+</style>
+</head>
+<body>
+<header><h1>Vibe<span>Mix</span></h1><small>arrange · blend · render</small><span class="ver" id="ver"></span></header>
+<main>
+  <aside>
+    <h2>Songs in your folder</h2>
+    <div id="library"></div>
+    <div class="stack">
+      <button id="addSongs">＋ Add songs…</button>
+      <input id="fileInput" type="file" multiple accept="audio/*,.wav,.flac,.mp3,.aiff,.aif,.ogg,.m4a" style="display:none">
+      <div class="upl" id="uplStatus"></div>
+      <button id="openTracks" class="ghost">Open songs folder</button>
+      <button id="refresh" class="ghost">Refresh</button>
+    </div>
+    <div class="hint">Click a song to add it to the mix. Drop files in the folder or use Add songs. Bandcamp WAV/FLAC sounds best.</div>
+  </aside>
+  <section>
+    <div class="toolbar">
+      <input id="title" type="text" placeholder="Mix title">
+      <select id="mixSel"><option value="">Saved mixes…</option></select>
+      <button id="saveMix" class="small">Save</button>
+      <button id="delMix" class="small ghost" title="Delete the selected saved mix">Delete</button>
+      <span style="flex:1"></span>
+      <button id="clear" class="ghost">Clear</button>
+      <button id="render" class="primary">Render mix</button>
+    </div>
+    <div class="toolbar opts">
+      <label class="chk"><input id="normalize" type="checkbox" checked> Level all songs to the same loudness</label>
+      <label class="chk"><input id="mp3" type="checkbox"> Also make an MP3 copy (for your phone / speaker)</label>
+    </div>
+    <div id="playlist"></div>
+    <div id="progress"></div>
+  </section>
+</main>
+
+<script>
+const $ = s => document.querySelector(s);
+let library = [], playlist = JSON.parse(localStorage.getItem('vibemix.playlist') || '[]');
+let peaksCache = {};
+$('#title').value = localStorage.getItem('vibemix.title') || '';
+$('#mp3').checked = localStorage.getItem('vibemix.mp3') === '1';
+
+const TRANSITIONS = {
+  smooth:   'Smooth — songs melt into each other',
+  dissolve: 'Dissolve — outgoing song sinks underwater',
+  cut:      'Breath — fade out, a beat of silence, fade in',
+};
+
+function fmt(s){ s=Math.max(0,Math.round(s)); const m=Math.floor(s/60), h=Math.floor(m/60); return h ? `${h}:${String(m%60).padStart(2,'0')}:${String(s%60).padStart(2,'0')}` : m+':'+String(s%60).padStart(2,'0'); }
+function base(f){ return f.replace(/\.[^.]+$/,''); }
+function esc(s){ return s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function save(){ localStorage.setItem('vibemix.playlist', JSON.stringify(playlist)); localStorage.setItem('vibemix.title', $('#title').value); localStorage.setItem('vibemix.mp3', $('#mp3').checked?'1':'0'); }
+function playlistJSON(){ return {title: $('#title').value || 'mix', normalize: $('#normalize').checked, mp3: $('#mp3').checked,
+  tracks: playlist.map(t => ({file:t.file, seconds:t.seconds, transition:t.transition, blend:t.blend, trim_start:t.trim_start||0, trim_end:t.trim_end||0}))}; }
+
+// ---------- library ----------
+async function loadLibrary(){
+  const r = await (await fetch('/api/tracks')).json();
+  library = r.tracks; $('#ver').textContent = 'v' + r.version;
+  const el = $('#library'); el.innerHTML = '';
+  if (!library.length) el.innerHTML = `<div class="empty">No songs yet. Use <b>Add songs</b>, or drop WAV / FLAC / MP3 files into the <b>tracks</b> folder and hit Refresh.</div>`;
+  for (const t of library) {
+    const d = document.createElement('div'); d.className='song';
+    d.innerHTML = `<span>${esc(base(t.file))}</span>` + (t.error ? `<span class="bad" title="${esc(t.error)}">can't read</span>` : `<span class="dur">${t.seconds?fmt(t.seconds):'?'}</span>`);
+    if (!t.error) { d.title = 'Add to mix'; d.onclick = () => { playlist.push({file:t.file, seconds:t.seconds, transition:'smooth', blend:12, trim_start:0, trim_end:0}); save(); drawPlaylist(); }; }
+    el.appendChild(d);
+  }
+}
+
+$('#addSongs').onclick = () => $('#fileInput').click();
+$('#fileInput').onchange = async e => {
+  const files = [...e.target.files]; let n = 0;
+  for (const f of files) {
+    $('#uplStatus').textContent = `Copying ${f.name} (${++n}/${files.length})…`;
+    const r = await fetch('/api/upload', {method:'POST', headers:{'X-Filename': encodeURIComponent(f.name)}, body: f});
+    if (!r.ok) $('#uplStatus').textContent = `Couldn't add ${f.name}`;
+  }
+  $('#uplStatus').textContent = files.length ? `Added ${files.length} song${files.length>1?'s':''}.` : '';
+  e.target.value = ''; loadLibrary();
+};
+
+// ---------- waveform ----------
+async function getPeaks(file){
+  if (peaksCache[file]) return peaksCache[file];
+  const r = await (await fetch('/api/peaks/'+encodeURIComponent(file))).json();
+  if (!r.error) peaksCache[file] = r;
+  return r;
+}
+
+function buildWave(wrap, t, audioEl){
+  const canvas = wrap.querySelector('canvas');
+  const sStart = wrap.querySelector('.skip.s'), sEnd = wrap.querySelector('.skip.e');
+  const hS = wrap.querySelector('.h.start'), hE = wrap.querySelector('.h.end');
+  const cur = wrap.querySelector('.cursor');
+  let secs = t.seconds || 0, data = null;
+
+  function layout(){
+    const W = wrap.clientWidth; if (!secs) return;
+    const a = (t.trim_start||0)/secs*W, b = W - (t.trim_end||0)/secs*W;
+    sStart.style.left='0'; sStart.style.width=a+'px';
+    sEnd.style.left=b+'px'; sEnd.style.width=(W-b)+'px';
+    hS.style.left=a+'px'; hE.style.left=b+'px';
+    hS.querySelector('span').textContent = (t.trim_start||0) ? `skip ${fmt(t.trim_start)}` : 'start';
+    hE.querySelector('span').textContent = (t.trim_end||0) ? `skip last ${fmt(t.trim_end)}` : 'end';
+  }
+  function draw(){
+    if (!data) return;
+    const W = wrap.clientWidth, H = wrap.clientHeight, dpr = window.devicePixelRatio||1;
+    canvas.width = W*dpr; canvas.height = H*dpr;
+    const c = canvas.getContext('2d'); c.scale(dpr,dpr); c.clearRect(0,0,W,H);
+    c.fillStyle = '#5fb3a3';
+    const n = data.peaks.length, bw = W/n, top = Math.max(...data.peaks, 0.05);   // scale to the song's own loudest point so quiet songs are readable
+    for (let i=0;i<n;i++){ const h = Math.max(1, data.peaks[i]/top*(H-6)); c.fillRect(i*bw, (H-h)/2, Math.max(bw-0.5,0.8), h); }
+    layout();
+  }
+  getPeaks(t.file).then(p => { if (p.error) { wrap.querySelector('.loading').textContent = "can't read this file"; return; } data = p; secs = p.seconds; t.seconds = p.seconds; wrap.querySelector('.loading').remove(); draw(); });
+  new ResizeObserver(draw).observe(wrap);
+
+  // drag handles
+  function dragHandle(h, which){
+    h.onpointerdown = e => {
+      e.preventDefault(); h.setPointerCapture(e.pointerId);
+      const W = wrap.clientWidth;
+      const move = ev => {
+        const x = Math.min(Math.max(ev.clientX - wrap.getBoundingClientRect().left, 0), W);
+        const sec = Math.round(x/W*secs);
+        if (which==='start') t.trim_start = Math.min(sec, secs - (t.trim_end||0) - 5);
+        else t.trim_end = Math.min(secs - sec, secs - (t.trim_start||0) - 5);
+        t.trim_start = Math.max(0, t.trim_start||0); t.trim_end = Math.max(0, t.trim_end||0);
+        layout(); wrap.dispatchEvent(new CustomEvent('trim'));
+      };
+      h.onpointermove = move;
+      h.onpointerup = () => { h.onpointermove = null; save(); wrap.dispatchEvent(new CustomEvent('trimdone')); };
+    };
+  }
+  dragHandle(hS,'start'); dragHandle(hE,'end');
+
+  // click to listen from there
+  wrap.onclick = e => {
+    if (e.target.closest('.h') || !secs) return;
+    const x = e.clientX - wrap.getBoundingClientRect().left;
+    audioEl.currentTime = x/wrap.clientWidth*secs; audioEl.play();
+  };
+  audioEl.ontimeupdate = () => { if (!secs) return; cur.style.display='block'; cur.style.left = (audioEl.currentTime/secs*wrap.clientWidth)+'px'; };
+  audioEl.onended = () => cur.style.display='none';
+  wrap.relayout = layout;
+}
+
+// ---------- playlist ----------
+function drawPlaylist(){
+  const el = $('#playlist'); el.innerHTML = '';
+  if (!playlist.length) { el.innerHTML = `<div class="empty">Click songs on the left to add them, in the order you want them played. Drag the grip ≡ to reorder. Each hand-off between two songs has its own style, and you can listen to just that hand-off before rendering the whole thing.</div>`; return; }
+  let total = 0;
+  playlist.forEach((t, i) => {
+    const last = i === playlist.length - 1;
+    const card = document.createElement('div'); card.className = 'card'; card.draggable = true; card.dataset.i = i;
+    card.innerHTML = `
+      <div class="top">
+        <span class="grip" title="Drag to reorder">≡</span>
+        <span class="num">${i+1}</span>
+        <span class="name">${esc(base(t.file))}<small>${t.seconds?fmt(t.seconds):''}</small></span>
+        <audio controls preload="none" src="/api/preview/${encodeURIComponent(t.file)}"></audio>
+        <button class="icon" data-a="del" title="Remove from mix">✕</button>
+      </div>
+      <div class="wave"><canvas></canvas><div class="skip s"></div><div class="skip e"></div><div class="h start"><span></span></div><div class="h end"><span></span></div><div class="cursor"></div><div class="loading">reading waveform…</div></div>
+      <div class="row">
+        <label>Skip first <input type="number" min="0" step="1" data-f="trim_start" value="${t.trim_start||0}"> s</label>
+        <label>Skip last <input type="number" min="0" step="1" data-f="trim_end" value="${t.trim_end||0}"> s</label>
+        <span>Drag the gold lines on the waveform, or click the waveform to listen from there.</span>
+        ${last ? '<span>· Last song — ends with a gentle 4-second fade.</span>' : ''}
+      </div>`;
+    const wave = card.querySelector('.wave'), audioEl = card.querySelector('audio');
+    buildWave(wave, t, audioEl);
+    wave.addEventListener('trim', () => { card.querySelector('[data-f=trim_start]').value = t.trim_start||0; card.querySelector('[data-f=trim_end]').value = t.trim_end||0; });
+    wave.addEventListener('trimdone', updateTotal);
+    card.querySelector('[data-a=del]').onclick = () => { playlist.splice(i,1); save(); drawPlaylist(); };
+    card.querySelectorAll('[data-f]').forEach(inp => inp.oninput = () => { t[inp.dataset.f] = Math.max(0, Number(inp.value)||0); wave.relayout(); save(); updateTotal(); });
+
+    // drag to reorder
+    card.ondragstart = e => { e.dataTransfer.setData('text/plain', i); card.classList.add('dragging'); };
+    card.ondragend = () => card.classList.remove('dragging');
+    card.ondragover = e => { e.preventDefault(); card.classList.add('over'); };
+    card.ondragleave = () => card.classList.remove('over');
+    card.ondrop = e => { e.preventDefault(); const from = Number(e.dataTransfer.getData('text/plain')); if (from===i) return; const [m] = playlist.splice(from,1); playlist.splice(i,0,m); save(); drawPlaylist(); };
+    el.appendChild(card);
+
+    if (!last) {
+      const next = playlist[i+1];
+      const hand = document.createElement('div'); hand.className = 'hand';
+      hand.innerHTML = `
+        <b>Hand-off</b>
+        <label><select data-f="transition">${Object.entries(TRANSITIONS).map(([k,v])=>`<option value="${k}" ${t.transition===k?'selected':''}>${v}</option>`).join('')}</select></label>
+        <label class="blendwrap" ${t.transition==='cut'?'style="display:none"':''}>Blend <input type="range" min="3" max="40" step="1" data-f="blend" value="${t.blend||12}"> <span class="bv">${t.blend||12}s</span></label>
+        <div class="aud"><button class="small" data-a="audition">▶ Hear this hand-off</button><span class="audstatus"></span></div>`;
+      hand.querySelectorAll('[data-f]').forEach(inp => inp.oninput = () => {
+        const f = inp.dataset.f; t[f] = inp.type==='range' ? Number(inp.value) : inp.value;
+        if (f==='blend') hand.querySelector('.bv').textContent = t.blend+'s';
+        if (f==='transition') hand.querySelector('.blendwrap').style.display = t.transition==='cut' ? 'none' : '';
+        save(); updateTotal();
+      });
+      hand.querySelector('[data-a=audition]').onclick = () => audition(t, next, hand);
+      el.appendChild(hand);
+    }
+  });
+  const sum = document.createElement('div'); sum.className='hint'; sum.id='total';
+  el.appendChild(sum); updateTotal();
+}
+
+function updateTotal(){
+  let total = 0;
+  playlist.forEach((t,i) => { const last = i===playlist.length-1;
+    total += (t.seconds||0) - (t.trim_start||0) - (t.trim_end||0) - (last ? 0 : (t.transition==='cut' ? -1.2 : (t.blend||12))); });
+  const el = $('#total'); if (el) el.textContent = `${playlist.length} song${playlist.length>1?'s':''} · about ${fmt(total)} of music`;
+}
+
+// ---------- audition one hand-off ----------
+async function audition(a, b, hand){
+  const st = hand.querySelector('.audstatus'); const btn = hand.querySelector('[data-a=audition]');
+  document.querySelectorAll('.hand audio').forEach(x => x.remove());
+  btn.disabled = true; st.textContent = 'Preparing…';
+  const r = await fetch('/api/audition', {method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({a:{file:a.file, trim_start:a.trim_start||0, trim_end:a.trim_end||0, transition:a.transition, blend:a.blend},
+                          b:{file:b.file, trim_start:b.trim_start||0, trim_end:b.trim_end||0}, normalize: $('#normalize').checked})});
+  if (!r.ok) { st.textContent = (await r.json()).error || 'Busy'; btn.disabled=false; return; }
+  const poll = setInterval(async () => {
+    const s = await (await fetch('/api/status')).json();
+    if (s.running && s.job==='audition' && s.progress) st.textContent = s.progress.message + '…';
+    if (!s.running) {
+      clearInterval(poll); btn.disabled = false;
+      if (s.error) { st.innerHTML = `<span class="err">${esc(s.error)}</span>`; return; }
+      st.textContent = `hand-off at ${fmt(s.result.handoff_at)} of this clip`;
+      const au = document.createElement('audio'); au.controls = true; au.className='wide'; au.src = '/api/audition.wav?t='+Date.now();
+      hand.appendChild(au); au.play().catch(()=>{});
+    }
+  }, 500);
+}
+
+// ---------- saved mixes ----------
+async function loadMixList(){
+  const r = await (await fetch('/api/mixes')).json();
+  const sel = $('#mixSel'); const cur = sel.value; sel.innerHTML = '<option value="">Saved mixes…</option>';
+  for (const m of r.mixes) { const o = document.createElement('option'); o.value = m.name; o.textContent = `${m.name} (${m.songs} songs)`; sel.appendChild(o); }
+  sel.value = cur;
+}
+$('#mixSel').onchange = async e => {
+  const name = e.target.value; if (!name) return;
+  if (playlist.length && !confirm(`Load "${name}"? Your current arrangement will be replaced (save it first if you want to keep it).`)) { e.target.value=''; return; }
+  const pl = await (await fetch('/api/mix/'+encodeURIComponent(name))).json();
+  playlist = pl.tracks || []; $('#title').value = pl.title || name; $('#normalize').checked = pl.normalize !== false; $('#mp3').checked = !!pl.mp3;
+  save(); drawPlaylist();
+};
+$('#saveMix').onclick = async () => {
+  if (!playlist.length) return alert('Nothing to save yet.');
+  const name = prompt('Save this mix as:', $('#title').value || 'My mix'); if (!name) return;
+  $('#title').value = name; save();
+  await fetch('/api/save-mix', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({name, playlist: playlistJSON()})});
+  await loadMixList(); $('#mixSel').value = name;
+};
+$('#delMix').onclick = async () => {
+  const name = $('#mixSel').value; if (!name) return alert('Pick a saved mix in the dropdown first.');
+  if (!confirm(`Delete the saved mix "${name}"? (Rendered WAV files are not touched.)`)) return;
+  await fetch('/api/delete-mix', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({name})});
+  await loadMixList();
+};
+
+// ---------- render ----------
+async function render(){
+  if (!playlist.length) return;
+  $('#render').disabled = true; save();
+  const r = await fetch('/api/render', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(playlistJSON())});
+  const p = $('#progress');
+  if (!r.ok) { p.innerHTML = `<div class="status err">${esc((await r.json()).error || 'Busy')}</div>`; $('#render').disabled=false; return; }
+  p.innerHTML = `<div class="bar"><div></div></div><div class="status">Starting…</div>`;
+  const poll = setInterval(async () => {
+    const s = await (await fetch('/api/status')).json();
+    if (s.progress) { p.querySelector('.bar div').style.width = (100*s.progress.step/s.progress.total)+'%'; p.querySelector('.status').textContent = s.progress.message; }
+    if (!s.running) {
+      clearInterval(poll); $('#render').disabled = false;
+      if (s.error) p.innerHTML = `<div class="status err">Something went wrong: ${esc(s.error)}</div>`;
+      else if (s.result) {
+        p.innerHTML = `<div class="done">✓ Mix rendered — ${fmt(s.result.seconds)} long<br>
+          <code>${esc(s.result.wav)}</code>${s.result.mp3 ? `<br><code>${esc(s.result.mp3)}</code>` : ''}${s.result.mp3_error ? `<br><span class="err">MP3 copy failed: ${esc(s.result.mp3_error)}</span>` : ''}
+          <div class="hint">The tracklist with timestamps is saved next to it — paste it into your YouTube description and it becomes chapters. The arrangement is saved there too, so you can re-render this exact mix later.</div>
+          <br><button id="openMixes">Open mixes folder</button></div>`;
+        $('#openMixes').onclick = () => fetch('/api/open-folder',{method:'POST',body:JSON.stringify({which:'mixes'})});
+      }
+    }
+  }, 700);
+}
+
+$('#render').onclick = render;
+$('#refresh').onclick = () => { peaksCache = {}; loadLibrary(); loadMixList(); };
+$('#clear').onclick = () => { if (confirm('Clear the mix?')) { playlist = []; save(); drawPlaylist(); } };
+$('#openTracks').onclick = () => fetch('/api/open-folder',{method:'POST',body:JSON.stringify({which:'tracks'})});
+$('#title').oninput = save; $('#mp3').onchange = save;
+loadLibrary(); loadMixList(); drawPlaylist();
+</script>
+</body>
+</html>

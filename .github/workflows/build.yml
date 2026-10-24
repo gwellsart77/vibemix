@@ -1,0 +1,66 @@
+name: Build desktop apps
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: macos-latest
+            label: Mac
+          - os: windows-latest
+            label: Windows
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -r requirements.txt pyinstaller
+      - name: Build
+        shell: bash
+        run: |
+          SEP=":"; [ "$RUNNER_OS" = "Windows" ] && SEP=";"
+          pyinstaller --onefile --windowed --name VibeMix --add-data "index.html${SEP}." --collect-all soundfile --collect-all scipy app.py
+      - name: Bundle
+        shell: bash
+        run: |
+          mkdir -p bundle/VibeMix/tracks bundle/VibeMix/mixes
+          cp README.md bundle/VibeMix/
+          touch bundle/VibeMix/tracks/.keep bundle/VibeMix/mixes/.keep
+          if [ "$RUNNER_OS" = "macOS" ]; then
+            cp -R dist/VibeMix.app bundle/VibeMix/
+            cat > "bundle/VibeMix/First time on Mac - read me.txt" <<'TXT'
+          macOS will say VibeMix is from an unidentified developer the first time.
+          Right-click (or Control-click) VibeMix.app and choose Open, then Open again.
+          You only have to do this once. Put your songs in the tracks folder next to the app.
+          TXT
+            cd bundle && zip -qry ../VibeMix-Mac.zip VibeMix
+          else
+            cp dist/VibeMix.exe bundle/VibeMix/
+            cd bundle && 7z a -tzip ../VibeMix-Windows.zip VibeMix > /dev/null
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: VibeMix-${{ matrix.label }}
+          path: VibeMix-${{ matrix.label }}.zip
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { path: out, merge-multiple: true }
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: out/*.zip
+          body: |
+            Download **VibeMix-Mac.zip** or **VibeMix-Windows.zip**, unzip, and double-click VibeMix.
+            No Python needed. Put songs in the `tracks` folder next to the app; mixes land in `mixes`.
+            Mac first run: right-click VibeMix.app → Open.
