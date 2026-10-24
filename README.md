@@ -47,7 +47,7 @@ WAV, FLAC, MP3, AIFF, OGG read natively. M4A / AAC need `ffmpeg` on the system
 
 ## Packaged apps (no Python needed)
 
-Every `v*` tag builds `VibeMix-Mac.zip` and `VibeMix-Windows.zip` on GitHub and
+Every push to `main` builds `VibeMix-Mac.zip` and `VibeMix-Windows.zip` on GitHub and
 attaches them to a Release (see `.github/workflows/build.yml`). Unzip, double-click
 VibeMix, done. The app looks for `tracks` and `mixes` folders next to itself.
 Mac first run: right-click VibeMix.app → Open (unsigned app).
