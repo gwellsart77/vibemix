@@ -24,8 +24,10 @@ synthetic audio. Delivered as `VibeMix.zip`.
       Breath sounds too abrupt in Phase 2 listening)
 
 ## Phase 2 — First real mix (NEXT — the only step Claude can't do)
-- [ ] Python 3 installed on Mac and PC (illustrated guide: https://claude.ai/artifact/MWEkH3XJYemGx1xBAj6ZYS)
-- [ ] Gabe unzips v0.2, adds 3–5 real Bandcamp tracks, uses "Hear this hand-off" on a couple of
+- [ ] Gabe downloads VibeMix-Mac.zip or VibeMix-Windows.zip from
+      https://github.com/gwellsart77/vibemix/releases/latest (no Python needed) — or runs the Drive
+      launcher (Python guide: https://claude.ai/artifact/MWEkH3XJYemGx1xBAj6ZYS)
+- [ ] Gabe adds 3–5 real Bandcamp tracks, uses "Hear this hand-off" on a couple of
       transitions, then renders a short test
 - [ ] Gabe listens and reports by ear: blend lengths, whether Dissolve is too subtle/too much,
       whether Breath's silence is too long, loudness feel, whether the waveform trims are easy
