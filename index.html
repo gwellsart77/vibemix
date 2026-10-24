@@ -79,7 +79,7 @@
 </style>
 </head>
 <body>
-<header><h1>Vibe<span>Mix</span></h1><small>arrange · blend · render</small><span class="ver" id="ver"></span></header>
+<header><h1>Vibe<span>Mix</span></h1><small>arrange · blend · render</small><span class="ver" id="ver"></span><button id="quit" class="small ghost" style="margin-left:12px" title="Stops VibeMix">Quit</button></header>
 <main>
   <aside>
     <h2>Songs in your folder</h2>
@@ -372,6 +372,7 @@ $('#refresh').onclick = () => { peaksCache = {}; loadLibrary(); loadMixList(); }
 $('#clear').onclick = () => { if (confirm('Clear the mix?')) { playlist = []; save(); drawPlaylist(); } };
 $('#openTracks').onclick = () => fetch('/api/open-folder',{method:'POST',body:JSON.stringify({which:'tracks'})});
 $('#title').oninput = save; $('#mp3').onchange = save;
+$('#quit').onclick = async () => { if (!confirm('Quit VibeMix? (Your arrangement is kept.)')) return; await fetch('/api/quit',{method:'POST'}); document.body.innerHTML = '<div class="empty" style="padding:40px;font-size:16px">VibeMix has stopped. You can close this tab.</div>'; };
 loadLibrary(); loadMixList(); drawPlaylist();
 </script>
 </body>

@@ -13,8 +13,10 @@ VERSION = "0.2"
 PORT = 8765
 
 BASE = os.path.dirname(os.path.abspath(sys.argv[0]))
-if getattr(sys, "frozen", False):            # packaged app: folders live next to the executable
+if getattr(sys, "frozen", False):            # packaged app: folders live next to the app
     BASE = os.path.dirname(sys.executable)
+    if sys.platform == "darwin" and ".app/Contents/MacOS" in BASE:   # inside VibeMix.app → next to the .app
+        BASE = os.path.dirname(BASE.split(".app/Contents/MacOS")[0] + ".app")
 TRACKS = os.path.join(BASE, "tracks")
 MIXES = os.path.join(BASE, "mixes")
 CACHE = os.path.join(BASE, ".cache")
@@ -246,6 +248,9 @@ class Handler(BaseHTTPRequestHandler):
             which = json.loads(self.read_body() or b"{}").get("which", "tracks")
             open_folder(TRACKS if which == "tracks" else MIXES)
             self.send_json({"ok": True})
+        elif p == "/api/quit":
+            self.send_json({"ok": True})
+            threading.Timer(0.3, lambda: os._exit(0)).start()
         else:
             self.send_json({"error": "not found"}, 404)
 

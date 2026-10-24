@@ -16,7 +16,7 @@ with vocals, where tempo-syncing sounds wrong. Transitions are about mood.
 3. Your browser opens at http://127.0.0.1:8765
 4. Use **Add songs…** (or drop WAV / FLAC / MP3 files in the `tracks` folder).
 
-Mixes land in the `mixes` folder. Close the black window to quit.
+Mixes land in the `mixes` folder. Use the **Quit** button (top right) or close the black window to quit.
 
 ## What you can do
 
@@ -45,8 +45,9 @@ exact arrangement so you can reproduce it.
 WAV, FLAC, MP3, AIFF, OGG read natively. M4A / AAC need `ffmpeg` on the system
 (`brew install ffmpeg` on Mac); otherwise convert them to WAV first.
 
-## Packaged apps
+## Packaged apps (no Python needed)
 
-Pushing a tag like `v0.2` to GitHub builds a double-click Mac app and a
-Windows .exe automatically (see `.github/workflows/build.yml`). The packaged
-app looks for `tracks` and `mixes` folders next to itself.
+Every `v*` tag builds `VibeMix-Mac.zip` and `VibeMix-Windows.zip` on GitHub and
+attaches them to a Release (see `.github/workflows/build.yml`). Unzip, double-click
+VibeMix, done. The app looks for `tracks` and `mixes` folders next to itself.
+Mac first run: right-click VibeMix.app → Open (unsigned app).
