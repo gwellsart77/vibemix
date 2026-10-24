@@ -24,11 +24,9 @@ synthetic audio. Delivered as `VibeMix.zip`.
       Breath sounds too abrupt in Phase 2 listening)
 
 ## Phase 2 — First real mix (NEXT — the only step Claude can't do)
-- [ ] Gabe downloads VibeMix-Mac.zip or VibeMix-Windows.zip from
-      https://github.com/gwellsart77/vibemix/releases/latest (no Python needed) — or runs the Drive
-      launcher (Python guide: https://claude.ai/artifact/MWEkH3XJYemGx1xBAj6ZYS)
-- [ ] Gabe adds 3–5 real Bandcamp tracks, uses "Hear this hand-off" on a couple of
-      transitions, then renders a short test
+- [x] App + 7 CC practice tracks installed at Desktop\VibeMix on Gabe's PC (v0.2.1)
+- [x] Automated real-music test of every feature (see session note) — all pass
+- [ ] Gabe opens VibeMix.exe, plays with "Hear this hand-off", renders a short mix
 - [ ] Gabe listens and reports by ear: blend lengths, whether Dissolve is too subtle/too much,
       whether Breath's silence is too long, loudness feel, whether the waveform trims are easy
 - [ ] Fix whatever that surfaces
@@ -36,21 +34,22 @@ synthetic audio. Delivered as `VibeMix.zip`.
 ## Phase 4 — Packaging ✅ (2026-10-24)
 - [x] GitHub repo `gwellsart77/vibemix` created (Gabe clicked Create; Claude pushed via session proxy)
 - [x] CI builds VibeMix.app + VibeMix.exe on every push to `main` and publishes the Release
-      https://github.com/gwellsart77/vibemix/releases/latest (v0.2: Mac 45 MB, Windows 69 MB)
+      https://github.com/gwellsart77/vibemix/releases/latest (v0.2.1: Mac 45 MB, Windows 69 MB)
 - [x] Python no longer needs to be installed on either machine
-- [ ] Gabe downloads the Release zip on one machine and confirms it launches (Gatekeeper / SmartScreen once)
+- [ ] Gabe confirms the exe launches on his PC (SmartScreen once)
 
 ## Parked / not doing
 - Beatmatching, BPM sync, key detection as a requirement — parked indefinitely (see rules).
 - Live two-deck mode — not doing.
 - Mobile app — not doing.
 - Reverb on Breath — parked until Phase 2 feedback says it's needed.
+- Ripping streams with OBS — not doing (ToS + audio quality). Use Bandcamp / free CC music.
 
 ## Chat board
 | Workstream | Owning chat | Started | Last handoff |
 |------------|-------------|---------|--------------|
 | v0.1 build + scaffold | "DJ Software" chat #1 (closed) | 2026-10-24 | HANDOFFS/2026-10-24_v0.1-build.md |
-| v0.2 build (Phase 3 + hardening) + Phase 4 packaging | "DJ Software" chat #2 | 2026-10-24 | HANDOFFS/2026-10-24_v0.2-build.md |
+| v0.2 build + Phase 4 + real-music test (v0.2.1) | "DJ Software" chat #2 | 2026-10-24 | HANDOFFS/2026-10-24_v0.2-build.md |
 
 ## Session notes
 ### 2026-10-24 — chat #1
@@ -70,7 +69,6 @@ classifier); Claude pushed `main`, found tag pushes 403 through the proxy, switc
 release-on-push-to-main with the tag read from `app.py`; added `.app`-aware folder location and a
 Quit button for the windowless packaged app; first run green on both OSes; Release v0.2 verified
 (zips downloaded and inspected). Drive mirror synced; `VibeMix.zip` on Drive retired.
-Open: Gabe's first real render (Phase 2) — now from the packaged app or the launcher.
 
 ### 2026-10-24 — chat #2, later: real-music automation test → v0.2.1
 Gabe asked for a full feature test on real songs. Set up `Desktop/VibeMix` on his PC (exe + 7
